@@ -1,19 +1,23 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 
-import { MasonryStyled } from './styles';
-import { MasonryColumn } from './MasonryColumn/MasonryColumn';
+import { MasonryStyled, MasonryContainer } from './styles';
+import { MasonryColumn } from './MasonryColumn';
 import { fetchPhotos } from '../../api';
 import { Photo } from 'pexels';
 import { PhotoWithTop } from '../../types';
 import { calculateGridItemHeight } from '../../utils';
 import { GRID_ITEMS_GAP } from '../../constants';
+import { LoadMore } from './LoadMore';
 
-const distributePhotos = (images: Array<Photo>, columnCount: number): {
+const distributePhotos = (images: Array<Photo>, columnCount: number, prevState: {
+  columns: Array<Array<PhotoWithTop>>,
+  columnsHeights: Array<number>,
+}): {
   columns: Array<Array<PhotoWithTop>>,
   columnsHeights: Array<number>,
 } => {
-  const columns = Array.from<Photo, PhotoWithTop[]>({ length: columnCount }, () => []);
-  const columnsHeights = new Array(columnCount).fill(0);
+  const columns = prevState.columns.length ? [...prevState.columns] : Array.from<Photo, PhotoWithTop[]>({ length: columnCount }, () => []);
+  const columnsHeights = prevState.columnsHeights.length ? [...prevState.columnsHeights] : new Array<number>(columnCount).fill(0);
 
   images.forEach((image) => {
     const minHeight = Math.min(...columnsHeights)
@@ -33,22 +37,30 @@ const distributePhotos = (images: Array<Photo>, columnCount: number): {
 };
 
 export const Masonry = () => {
-  const [columns, setColumns] = useState<PhotoWithTop[][]>([[]]);
+  const [columns, setColumns] = useState<PhotoWithTop[][]>([]);
   const [columnsHeights, setColumnsHeights] = useState<Array<number>>([]);
+  const [page, setPage] = useState(1);
 
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    fetchPhotos().then(photos => {
-      const {columns, columnsHeights} = distributePhotos(photos, 6)
-      setColumns(columns);
-      setColumnsHeights(columnsHeights)
-    }).catch(error => console.error(error));
+  const onLoadMore = useCallback(() => {
+    setPage(page => page + 1);
   }, [])
 
-  return <MasonryStyled ref={ref}>
+  useEffect(() => {
+    fetchPhotos(page).then(photos => {
+      const {columns: newColumns, columnsHeights: newColumnsHeights} = distributePhotos(photos, 6, {columns, columnsHeights})
+      setColumns(newColumns);
+      setColumnsHeights(newColumnsHeights)
+    }).catch(error => console.error(error));
+  }, [page])
+
+  return <MasonryContainer ref={ref}>
+    <MasonryStyled>
     {columns.map((column, index) => (
-      column.length ? <MasonryColumn masonryRef={ref} photos={column} key={index}  height={columnsHeights[index]}/> : null
+      column.length ? <MasonryColumn masonryRef={ref} photos={column} key={index} height={columnsHeights[index]}/> : null
     ))}
-  </MasonryStyled>;
+  </MasonryStyled>
+  {columnsHeights.length ? <LoadMore onLoadMore={onLoadMore} /> : null}
+  </MasonryContainer>;
 };

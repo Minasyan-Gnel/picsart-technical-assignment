@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState, useRef } from 'react';
 import { MasonryColumnStyled } from './styles';
 import { MasonryItem } from '../MasonryItem';
 import { Photo } from 'pexels';
@@ -30,10 +30,10 @@ const getVisiblePhotosCount = (photos: Array<Photo>) => {
 }
 
 export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height, masonryRef}) => {
-  const [visiblePhotos, setVisiblePhotos] = useState<Array<PhotoWithTop>>([]);
-  const [startIndex, setStartIndex] = useState(0);
-  const [endIndex, setEndIndex] = useState(0);
+  const [visiblePhotos, setVisiblePhotos] = useState<Array<PhotoWithTop>>(photos.slice(0, getVisiblePhotosCount(photos) + 1));
 
+  const startIndexRef = useRef<number>(0);
+  const endIndexRef = useRef<number>(getVisiblePhotosCount(photos));
 
   useEffect(() => {
     const masonryContainer = masonryRef.current;
@@ -42,36 +42,37 @@ export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height, masonryRe
       requestAnimationFrame(() => {
         const firstPhoto = visiblePhotos[0];
         const lastPhoto = visiblePhotos[visiblePhotos.length - 1];
+        let nextStartIndex = startIndexRef.current;
+        let nextEndIndex = endIndexRef.current;
 
         if (e.target.scrollTop - threshold > firstPhoto.top + firstPhoto.height) {
-          setStartIndex((prevState) => {
-            return prevState + 1
-          })
+          nextStartIndex += 1
         }
 
         if (e.target.scrollTop < firstPhoto.top + threshold) {
-          setStartIndex((prevState) => {
-            if (prevState > 0) {
-              return prevState - 1
-            }
-            return prevState
-          })
+          if (nextStartIndex > 0) {
+            nextStartIndex -= 1
+          }
         }
 
         if (e.target.scrollTop + e.target.clientHeight + threshold > lastPhoto.top + lastPhoto.height) {
-          setEndIndex((prevState) => {
-            if (prevState < photos.length) {
-              return prevState + 1
-            }
-            return prevState
-          })
+          if (nextEndIndex < photos.length) {
+            nextEndIndex += 1
+          }
         }
 
         if (e.target.scrollTop + e.target.clientHeight + threshold < lastPhoto.top) {
-          setEndIndex((prevState) => {
-            return prevState - 1
-          })
+          nextEndIndex -= 1
         }
+
+        setVisiblePhotos((prevState) => {
+          if (nextStartIndex !== startIndexRef.current || nextEndIndex !== endIndexRef.current) {
+            startIndexRef.current = nextStartIndex;
+            endIndexRef.current = nextEndIndex;
+            return photos.slice(nextStartIndex, nextEndIndex)
+          }
+          return prevState;
+        });
       })
     }
 
@@ -82,16 +83,7 @@ export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height, masonryRe
     return () => {
       masonryContainer.removeEventListener('scroll', handleScroll)
     }
-  }, [masonryRef, visiblePhotos])
-
-  useEffect(() => {
-    const visiblePhotosCount = getVisiblePhotosCount(photos);
-    setEndIndex(visiblePhotosCount - 1)
-  }, []);
-
-  useEffect(() => {
-    setVisiblePhotos(photos.slice(startIndex, endIndex + 1));
-  }, [startIndex, endIndex]);
+  }, [visiblePhotos])
 
   return <MasonryColumnStyled width={masonryColumnWidth} height={height}>
     {
