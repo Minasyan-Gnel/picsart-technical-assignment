@@ -1,24 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
-import { MasonryItem } from './MasonryItem';
-import { useColumnsWithPhotos } from '../../hooks';
-import { MasonryStyled, MasonryColumnStyled } from './styles';
+import { MasonryStyled } from './styles';
+import { MasonryColumn } from './MasonryColumn/MasonryColumn';
+import { fetchPhotos } from '../../api';
+import { Photo } from 'pexels';
+import { PhotoWithTop } from '../../types';
+import { calculateGridItemHeight } from '../../utils';
+import { GRID_ITEMS_GAP } from '../../constants';
 
+const distributePhotos = (images: Array<Photo>, columnCount: number): {
+  columns: Array<Array<PhotoWithTop>>,
+  columnsHeights: Array<number>,
+} => {
+  const columns = Array.from<Photo, PhotoWithTop[]>({ length: columnCount }, () => []);
+  const columnsHeights = new Array(columnCount).fill(0);
+
+  images.forEach((image) => {
+    const minHeight = Math.min(...columnsHeights)
+    const imageHeight = calculateGridItemHeight(image.width, image.height);
+    const columnIndex = columnsHeights.indexOf(minHeight);
+
+    columns[columnIndex].push({
+      ...image,
+      height: imageHeight,
+      top: columnsHeights[columnIndex]
+    });
+
+    columnsHeights[columnIndex]+= imageHeight + GRID_ITEMS_GAP
+  });
+
+  return { columns, columnsHeights };
+};
 
 export const Masonry = () => {
-  const { columns } = useColumnsWithPhotos();
+  const [columns, setColumns] = useState<PhotoWithTop[][]>([[]]);
+  const [columnsHeights, setColumnsHeights] = useState<Array<number>>([]);
 
-  return <MasonryStyled>
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchPhotos().then(photos => {
+      const {columns, columnsHeights} = distributePhotos(photos, 6)
+      setColumns(columns);
+      setColumnsHeights(columnsHeights)
+    }).catch(error => console.error(error));
+  }, [])
+
+  return <MasonryStyled ref={ref}>
     {columns.map((column, index) => (
-      <MasonryColumnStyled key={index}>
-        {column.map((photo, index) => {
-          const itemWidth = 200;
-          const aspectRatio = photo.width / photo.height;
-          const itemHeight = itemWidth * aspectRatio;
-
-          return <MasonryItem key={index} height={itemHeight} width={itemWidth} image={photo.src.medium}/>
-        })}
-      </MasonryColumnStyled>
+      column.length ? <MasonryColumn masonryRef={ref} photos={column} key={index}  height={columnsHeights[index]}/> : null
     ))}
   </MasonryStyled>;
 };
