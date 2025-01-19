@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
-import { Photo } from 'pexels';
+import { Link } from 'react-router-dom';
 
+import { Photo } from '../../../types';
 import { MasonryItemStyled, Image } from './styles';
 
 interface IMasonryItemProps {
@@ -13,7 +14,9 @@ interface IMasonryItemProps {
 }
 
 export const MasonryItem: FC<IMasonryItemProps> = ({ width, height, top, src, alt, id }) => {
-  return <MasonryItemStyled data-id={id} width={width} height={height} top={top}>
-    <Image src={src.medium} alt={alt} />
+  return <MasonryItemStyled width={width} height={height} top={top}>
+    <Link to={`/photo/${id}`}>
+      <Image src={src.medium} alt={alt} />
+    </Link>
   </MasonryItemStyled>;
 }
