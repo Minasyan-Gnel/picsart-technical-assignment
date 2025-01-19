@@ -1,23 +1,23 @@
 export interface Photo {
   id: number;
+  url: string;
   width: number;
   height: number;
-  url: string;
-  alt: string | null;
-  avg_color: string | null;
-  photographer: string;
-  photographer_url: string;
-  photographer_id: string;
   liked: boolean;
+  alt: string | null;
+  photographer: string;
+  photographer_id: string;
+  photographer_url: string;
+  avg_color: string | null;
   src: {
-      original: string;
-      large2x: string;
-      large: string;
-      medium: string;
-      small: string;
-      portrait: string;
-      landscape: string;
-      tiny: string;
+    tiny: string;
+    large: string;
+    small: string;
+    medium: string;
+    large2x: string;
+    original: string;
+    portrait: string;
+    landscape: string;
   };
 }
 

@@ -1,29 +1,35 @@
-
-import { Photo } from '../types';
-import { fetchPhotos, fetchSearchPhotos } from '../api';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+import { Photo } from '../types';
+import { PER_PAGE_COUNT } from '../constants';
+import { fetchPhotos, fetchSearchPhotos } from '../api';
 
 type PhotoStore = {
   page: number;
   photos: Photo[];
+  isLoading: boolean;
+  noMorePhotos: boolean;
+  getPhotos: () => Promise<void>;
   loadMore: (query?: string | null) => Promise<void>;
-  getPhotos: (page?: number, count?: number) => Promise<void>;
-  searchPhotos: (query: string, page?: number, perPageCount?: number) => Promise<void>;
+  searchPhotos: (query: string, page?: number) => Promise<void>;
 }
 
 export const usePhotoStore = createWithEqualityFn<PhotoStore>((set, get) => ({
   page: 1,
   photos: [],
-  getPhotos: async (count = 80) => {
-    const photos = await fetchPhotos(1, count);
+  isLoading: false,
+  noMorePhotos: false,
+  getPhotos: async () => {
+    set({ isLoading: true });
+    const photos = await fetchPhotos(1, PER_PAGE_COUNT);
 
-    set({ photos, page: 1 });
+    set({ photos, page: 1, isLoading: false });
   },
-  searchPhotos: async (query, perPageCount = 80) => {
-    const photos = await fetchSearchPhotos(query, 1, perPageCount);
+  searchPhotos: async (query) => {
+    set({ isLoading: true });
+    const photos = await fetchSearchPhotos(query, 1, PER_PAGE_COUNT);
 
-    set({ photos, page: 1 });
+    set({ photos, page: 1, isLoading: false, noMorePhotos: photos.length < PER_PAGE_COUNT });
   },
   loadMore: async (query) => {
     const { page } = get();
@@ -35,7 +41,8 @@ export const usePhotoStore = createWithEqualityFn<PhotoStore>((set, get) => ({
     set((prevState) => ({
       ...prevState,
       page: newPage,
+      noMorePhotos: photos.length < PER_PAGE_COUNT,
       photos: [...prevState.photos, ...photos],
-    }))
+    }));
   }
 }));

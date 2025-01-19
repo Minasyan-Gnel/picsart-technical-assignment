@@ -8,10 +8,8 @@ interface IMasonryItemProps {
   photo: PhotoWithTop;
 }
 
-export const MasonryItem: FC<IMasonryItemProps> = ({ photo }) => {
-  return <MasonryItemStyled height={photo.height} top={photo.top} color={photo.avg_color || ""}>
-    <Link to={`/photo/${photo.id}`}>
-      <Image src={photo.src.medium} alt={photo.alt || ""}/>
-    </Link>
-  </MasonryItemStyled>;
-}
+export const MasonryItem: FC<IMasonryItemProps> = ({ photo }) => <MasonryItemStyled height={photo.height} top={photo.top} color={photo.avg_color || ""}>
+  <Link to={`/photo/${photo.id}`}> 
+    <Image src={photo.src.medium} alt={photo.alt || ""}/>
+  </Link>
+</MasonryItemStyled>;

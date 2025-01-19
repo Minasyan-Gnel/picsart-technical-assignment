@@ -2,15 +2,14 @@ import styled from 'styled-components';
 
 export const PhotoDetailsHeaderStyled = styled.div`
   padding: 20px 20px;
-`
-
+`;
 
 export const PhotoDetailsContainerStyled = styled.div`
   width: 100%;
-  height: calc(100% - 79px);
   display: flex;
   align-items: center;
   justify-content: center;
+  height: calc(100% - 79px);
 `;
 
 export const PhotoDetailsStyled = styled.div`
@@ -33,11 +32,11 @@ export const PhotoDetailsStyled = styled.div`
 
 export const PhotoDetailsInfoStyled = styled.div`
   display: flex;
-  flex-direction: column;
   gap: 10px;
   font-size: 18px;
+  flex-direction: column;
 
-  @media (max-width: 590px) {
+  @media (max-width: 590px) { 
     margin-top: 10px;
   }
 `;
@@ -52,12 +51,12 @@ export const BackButtonStyled = styled.div`
   &:hover {
     box-shadow: 0px 0px 5px 0px #929090 inset;
   }
-    > a {
-         padding: 10px 20px;
+  > a {
+    color: black;
+    padding: 10px 20px;
     display: inline-block;
     text-decoration: none;
-    color: black;
-    }
+  }
 `;
 
 export const PhotoDetailsImageInfoStyled = styled.div`

@@ -2,9 +2,11 @@ import styled from "styled-components";
 
 export const SearchContainer = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 10px 0;
+  align-items: center;
+  margin-bottom: 10px;
+  justify-content: center;
+  border-bottom: 1px solid #ccc;
 `;
 
 export const SearchInput = styled.input`

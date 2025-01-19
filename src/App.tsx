@@ -5,12 +5,10 @@ import { GlobalStyles } from './global.styles';
 import { Masonry } from './components/Masonry';
 import { PhotoDetails } from './components/PhotoDetails';
 
-export const App = () => {
-  return <BrowserRouter>
-    <GlobalStyles />
-    <Routes>
-      <Route path="/" element={<Masonry />} />
-      <Route path="/photo/:id" element={<PhotoDetails />} />
-    </Routes>
-  </BrowserRouter>;
-};
+export const App = () => <BrowserRouter>
+  <GlobalStyles />
+  <Routes>
+    <Route path="/" element={<Masonry />} />
+    <Route path="/photo/:id" element={<PhotoDetails />} />
+  </Routes>
+</BrowserRouter>;
