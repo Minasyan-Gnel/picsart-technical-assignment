@@ -1,21 +1,21 @@
-import React, { FC, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 
-type LoadMoreProps = {
-    onLoadMore: () => void;
-}
+import { usePhotoStore } from "../../../stores/PhotoStore";
 
-export const LoadMore: FC<LoadMoreProps> = ({onLoadMore}) => {
+export const LoadMore = () => {
     const loadMoreRef = useRef<HTMLDivElement>(null);
+
+    const { loadMore } = usePhotoStore();
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              onLoadMore()
-            }
-          })
-        },
-    )
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadMore()
+                    }
+                })
+            },
+        )
     
         if (loadMoreRef.current) {
           observer.observe(loadMoreRef.current)
@@ -24,7 +24,7 @@ export const LoadMore: FC<LoadMoreProps> = ({onLoadMore}) => {
         return () => {
           observer.disconnect()
         }
-      }, [onLoadMore])
+    }, [loadMore])
 
   return <div ref={loadMoreRef} style={{ height: '1px' }} />
 }

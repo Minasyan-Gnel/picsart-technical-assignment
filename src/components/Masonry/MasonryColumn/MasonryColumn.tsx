@@ -1,32 +1,13 @@
 import React, { FC, useEffect, useState, useRef } from 'react';
-import { MasonryColumnStyled } from './styles';
+
 import { MasonryItem } from '../MasonryItem';
-import { Photo } from 'pexels';
-import { masonryColumnWidth } from '../../../constants';
 import { PhotoWithTop } from '../../../types';
+import { MasonryColumnStyled } from './styles';
+import { MASONRY_COLUMN_WIDTH } from '../../../constants';
 
 type MasonryColumnProps = {
-  photos: Array<PhotoWithTop>;
   height: number;
-  masonryRef: React.RefObject<HTMLDivElement | null>;
-}
-
-const getVisiblePhotosCount = (photos: Array<Photo>) => {
-  const viewportHeight = window.innerHeight;
-  let currHeight = 0;
-  let visiblePhotosCount = 0;
-  for(const photo of photos) {
-    if(viewportHeight > currHeight) {
-      visiblePhotosCount += 1;
-      currHeight += photo.height;
-      continue
-    }
-    currHeight += photo.height;
-    visiblePhotosCount += 1;
-    break
-  }
-
-  return visiblePhotosCount;
+  photos: Array<PhotoWithTop>;
 }
 
 export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height}) => {
@@ -80,7 +61,7 @@ export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height}) => {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [visiblePhotos])
+  }, [visiblePhotos, photos])
 
   useEffect(() => {
     const startIndex = photos.findIndex((photo) => {
@@ -98,7 +79,7 @@ export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height}) => {
 
   return <MasonryColumnStyled style={{ height }}>
     {
-      visiblePhotos.map((photo) => <MasonryItem src={photo.src} id={photo.id} alt={photo.alt || ""} width={masonryColumnWidth} height={photo.height} top={photo.top} key={photo.id}/>)
+      visiblePhotos.map((photo) => <MasonryItem src={photo.src} id={photo.id} alt={photo.alt || ""} width={MASONRY_COLUMN_WIDTH} height={photo.height} top={photo.top} key={photo.id}/>)
     }
   </MasonryColumnStyled>
 }

@@ -1,8 +1,8 @@
-import { masonryColumnWidth } from '../constants';
+import { MASONRY_COLUMN_WIDTH } from '../constants';
 
 export const calculateGridItemHeight = (width: number, height: number) => {
   const aspectRatio = height / width;
-  return masonryColumnWidth * aspectRatio;
+  return MASONRY_COLUMN_WIDTH * aspectRatio;
 }
 
 export const debounce = (func: (...args: any[]) => void, delay: number) => {
