@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 
-export const MasonryItemStyled = styled.div<{ width: number, height: number, top: number }>`
+export const MasonryItemStyled = styled.div<{ height: number, top: number, color: string }>`
     width: 100%;
     overflow: hidden;
     position: absolute;
-    top: ${({ top }) => `${top}px`};
     border-radius: 8px;
-    background: #f0f0f0;
     height: ${({ height }) => `${height}px`};
+    background: ${({ color }) => color};
+    transform: translateY(${({ top }) => `${top}px`});
     :hover {
         transform: translateY(-10px);
     }

@@ -3,7 +3,6 @@ import React, { FC, useEffect, useState, useRef } from 'react';
 import { MasonryItem } from '../MasonryItem';
 import { PhotoWithTop } from '../../../types';
 import { MasonryColumnStyled } from './styles';
-import { MASONRY_COLUMN_WIDTH } from '../../../constants';
 
 type MasonryColumnProps = {
   height: number;
@@ -79,7 +78,7 @@ export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height}) => {
 
   return <MasonryColumnStyled style={{ height }}>
     {
-      visiblePhotos.map((photo) => <MasonryItem src={photo.src} id={photo.id} alt={photo.alt || ""} width={MASONRY_COLUMN_WIDTH} height={photo.height} top={photo.top} key={photo.id}/>)
+      visiblePhotos.map((photo) => <MasonryItem photo={photo} key={photo.id}/>)
     }
   </MasonryColumnStyled>
 }

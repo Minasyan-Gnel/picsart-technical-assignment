@@ -38,7 +38,7 @@ export const PhotoDetails = () => {
             </PhotoDetailsInfoStyled>
         </PhotoDetailsImageInfoStyled>
       <PhotoDetailsImageWrapperStyled width={width} height={height}>
-        <img src={photo.src.large} />
+        <img src={photo.src.original} alt={photo.alt || 'Original image'} />
       </PhotoDetailsImageWrapperStyled>
     </PhotoDetailsStyled>
   </PhotoDetailsContainerStyled>

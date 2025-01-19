@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { debounce } from '../../utils';
 import { SearchContainer, SearchInput } from './styles';
 
-type SearchProps = {
-    onSearch: (search: string) => void;
-}
+export const Search = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
 
-export const Search = ({onSearch}: SearchProps) => {
+    const onSearch = useCallback((search: string) => {
+        setSearchParams({q: search})
+    }, [setSearchParams])
+
     const debouncedSearch = debounce(onSearch, 500);
 
     return <SearchContainer>
-        <SearchInput type="text" placeholder="Search photos" onChange={(e) => debouncedSearch(e.target.value)} />
+        <SearchInput type="text" defaultValue={searchParams.get('q') || ''} placeholder="Search photos" onChange={(e) => debouncedSearch(e.target.value)} />
     </SearchContainer>;
 };
 

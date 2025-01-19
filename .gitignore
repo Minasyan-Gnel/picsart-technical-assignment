@@ -8,6 +8,9 @@
 !.vscode/extensions.json
 .DS_Store
 
+# Build
+/build
+
 stats.json
 # Logs
 logs

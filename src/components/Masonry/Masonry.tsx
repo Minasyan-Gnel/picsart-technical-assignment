@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Photo } from 'pexels';
+import { useSearchParams } from 'react-router-dom';
 
 import { Search } from '../Search';
 import { LoadMore } from './LoadMore';
@@ -42,21 +43,19 @@ export const Masonry = () => {
   const [columnsHeights, setColumnsHeights] = useState<Array<number>>([]);
   const [columnsCount, setColumnsCount] = useState(Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH));
 
-  const { photos, fetchPhotos, searchPhotos } = usePhotoStore();
+  const { photos, getPhotos, searchPhotos } = usePhotoStore();
+  const [searchParams] = useSearchParams();
 
   const ref = useRef<HTMLDivElement>(null);
 
-  const onSearch = useCallback((search: string) => {
+  useEffect(() => {
+    const search = searchParams.get('q');
     if (search) {
       searchPhotos(search)
     } else {
-      fetchPhotos()
+      getPhotos()
     }
-  }, [searchPhotos, fetchPhotos])
-
-  useEffect(() => {
-    fetchPhotos()
-  }, [fetchPhotos])
+}, [searchParams, searchPhotos, getPhotos])
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
@@ -81,7 +80,7 @@ export const Masonry = () => {
   }, [columnsCount, photos])
 
   return <>
-    <Search onSearch={onSearch}/>
+    <Search/>
     <MasonryContainer ref={ref}>
     <MasonryStyled>
       {columns.map((column, index) => (

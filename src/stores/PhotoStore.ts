@@ -7,30 +7,33 @@ import { createWithEqualityFn } from 'zustand/traditional';
 type PhotoStore = {
   page: number;
   photos: Photo[];
-  loadMore: () => Promise<void>;
-  fetchPhotos: (page?: number, count?: number) => Promise<void>;
+  loadMore: (query?: string | null) => Promise<void>;
+  getPhotos: (page?: number, count?: number) => Promise<void>;
   searchPhotos: (query: string, page?: number, perPageCount?: number) => Promise<void>;
 }
 
 export const usePhotoStore = createWithEqualityFn<PhotoStore>((set, get) => ({
   page: 1,
   photos: [],
-  fetchPhotos: async (page = 1, count = 80) => {
-    const photos = await fetchPhotos(page, count);
+  getPhotos: async (count = 80) => {
+    const photos = await fetchPhotos(1, count);
 
-    set({ photos });
+    set({ photos, page: 1 });
   },
-  searchPhotos: async (query: string, page = 1, perPageCount = 80) => {
-    const photos = await fetchSearchPhotos(query, page, perPageCount);
+  searchPhotos: async (query, perPageCount = 80) => {
+    const photos = await fetchSearchPhotos(query, 1, perPageCount);
 
-    set({ photos });
+    set({ photos, page: 1 });
   },
-  loadMore: async () => {
+  loadMore: async (query) => {
     const { page } = get();
     const newPage = page + 1;
-    const photos = await fetchPhotos(newPage);
+    const photos = query
+      ? await fetchSearchPhotos(query, newPage)
+      : await fetchPhotos(newPage);
 
     set((prevState) => ({
+      ...prevState,
       page: newPage,
       photos: [...prevState.photos, ...photos],
     }))
