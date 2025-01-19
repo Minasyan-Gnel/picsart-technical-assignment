@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 export const MasonryContainer = styled.div`
-  overflow: auto;
-  max-height: 100vh;
+  width: 100vw;
+  height: 100vh;
 `
 
 export const MasonryStyled = styled.div`

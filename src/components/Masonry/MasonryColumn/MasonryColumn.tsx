@@ -29,44 +29,43 @@ const getVisiblePhotosCount = (photos: Array<Photo>) => {
   return visiblePhotosCount;
 }
 
-export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height, masonryRef}) => {
-  const [visiblePhotos, setVisiblePhotos] = useState<Array<PhotoWithTop>>(photos.slice(0, getVisiblePhotosCount(photos) + 1));
+export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height}) => {
+  const [visiblePhotos, setVisiblePhotos] = useState<Array<PhotoWithTop>>([]);
 
   const startIndexRef = useRef<number>(0);
-  const endIndexRef = useRef<number>(getVisiblePhotosCount(photos));
+  const endIndexRef = useRef<number>(0);
 
   useEffect(() => {
-    const masonryContainer = masonryRef.current;
     const threshold = 100;
-    const handleScroll = (e) => {
+    const handleScroll = () => {
       requestAnimationFrame(() => {
         const firstPhoto = visiblePhotos[0];
         const lastPhoto = visiblePhotos[visiblePhotos.length - 1];
         let nextStartIndex = startIndexRef.current;
         let nextEndIndex = endIndexRef.current;
 
-        if (e.target.scrollTop - threshold > firstPhoto.top + firstPhoto.height) {
+        if (window.pageYOffset - threshold > firstPhoto.top + firstPhoto.height) {
           nextStartIndex += 1
         }
 
-        if (e.target.scrollTop < firstPhoto.top + threshold) {
+        if (window.pageYOffset < firstPhoto.top + threshold) {
           if (nextStartIndex > 0) {
             nextStartIndex -= 1
           }
         }
 
-        if (e.target.scrollTop + e.target.clientHeight + threshold > lastPhoto.top + lastPhoto.height) {
+        if (window.pageYOffset + document.documentElement.clientHeight + threshold > lastPhoto.top + lastPhoto.height) {
           if (nextEndIndex < photos.length) {
             nextEndIndex += 1
           }
         }
 
-        if (e.target.scrollTop + e.target.clientHeight + threshold < lastPhoto.top) {
+        if (window.pageYOffset + document.documentElement.clientHeight + threshold < lastPhoto.top) {
           nextEndIndex -= 1
         }
 
         setVisiblePhotos((prevState) => {
-          if (nextStartIndex !== startIndexRef.current || nextEndIndex !== endIndexRef.current) {
+          if ((nextStartIndex !== startIndexRef.current || nextEndIndex !== endIndexRef.current)) {
             startIndexRef.current = nextStartIndex;
             endIndexRef.current = nextEndIndex;
             return photos.slice(nextStartIndex, nextEndIndex)
@@ -76,16 +75,28 @@ export const MasonryColumn: FC<MasonryColumnProps> = ({photos, height, masonryRe
       })
     }
 
-    if (masonryContainer) {
-      masonryContainer.addEventListener('scroll', handleScroll)
-    }
+    window.addEventListener('scroll', handleScroll)
 
     return () => {
-      masonryContainer.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [visiblePhotos])
 
-  return <MasonryColumnStyled width={masonryColumnWidth} height={height}>
+  useEffect(() => {
+    const startIndex = photos.findIndex((photo) => {
+      return window.pageYOffset <= photo.top + photo.height
+    })
+
+    const endIndex = photos.findIndex((photo) => {
+      return window.pageYOffset + window.innerHeight <= photo.top
+    })
+    
+    setVisiblePhotos(photos.slice(startIndex, endIndex))
+    startIndexRef.current = startIndex;
+    endIndexRef.current = endIndex;
+  }, [photos])
+
+  return <MasonryColumnStyled style={{ height }}>
     {
       visiblePhotos.map((photo) => <MasonryItem src={photo.src} id={photo.id} alt={photo.alt || ""} width={masonryColumnWidth} height={photo.height} top={photo.top} key={photo.id}/>)
     }

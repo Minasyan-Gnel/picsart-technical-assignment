@@ -6,7 +6,7 @@ import { fetchPhotos } from '../../api';
 import { Photo } from 'pexels';
 import { PhotoWithTop } from '../../types';
 import { calculateGridItemHeight } from '../../utils';
-import { GRID_ITEMS_GAP } from '../../constants';
+import { GRID_ITEMS_GAP, masonryColumnWidth } from '../../constants';
 import { LoadMore } from './LoadMore';
 
 const distributePhotos = (images: Array<Photo>, columnCount: number, prevState: {
@@ -37,9 +37,11 @@ const distributePhotos = (images: Array<Photo>, columnCount: number, prevState: 
 };
 
 export const Masonry = () => {
+  const [photos, setPhotos] = useState<Array<Photo>>([]);
   const [columns, setColumns] = useState<PhotoWithTop[][]>([]);
   const [columnsHeights, setColumnsHeights] = useState<Array<number>>([]);
   const [page, setPage] = useState(1);
+  const [columnsCount, setColumnsCount] = useState(Math.round(window.innerWidth / masonryColumnWidth));
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -49,18 +51,38 @@ export const Masonry = () => {
 
   useEffect(() => {
     fetchPhotos(page).then(photos => {
-      const {columns: newColumns, columnsHeights: newColumnsHeights} = distributePhotos(photos, 6, {columns, columnsHeights})
-      setColumns(newColumns);
-      setColumnsHeights(newColumnsHeights)
+      setPhotos(prevState => [...prevState, ...photos])
     }).catch(error => console.error(error));
   }, [page])
 
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      setColumnsCount(Math.round(window.innerWidth / masonryColumnWidth))
+    })
+
+    if (ref.current) {
+      resizeObserver.observe(ref.current)
+    }
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (photos.length) {
+      const {columns: newColumns, columnsHeights: newColumnsHeights} = distributePhotos(photos, columnsCount, {columns: [], columnsHeights: []})
+      setColumns(newColumns);
+      setColumnsHeights(newColumnsHeights)
+    }
+  }, [columnsCount, photos])
+
   return <MasonryContainer ref={ref}>
     <MasonryStyled>
-    {columns.map((column, index) => (
-      column.length ? <MasonryColumn masonryRef={ref} photos={column} key={index} height={columnsHeights[index]}/> : null
-    ))}
-  </MasonryStyled>
+      {columns.map((column, index) => (
+        column.length ? <MasonryColumn masonryRef={ref} photos={column} key={index} height={columnsHeights[index]}/> : null
+      ))}
+    </MasonryStyled>
   {columnsHeights.length ? <LoadMore onLoadMore={onLoadMore} /> : null}
   </MasonryContainer>;
 };
