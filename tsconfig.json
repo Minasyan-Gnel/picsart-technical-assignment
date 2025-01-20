@@ -14,7 +14,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "types": ["jest", "jest-extended"]
   },
   "include": ["src"],
   "exclude": ["node_modules"]

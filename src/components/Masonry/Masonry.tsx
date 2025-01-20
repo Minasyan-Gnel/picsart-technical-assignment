@@ -1,17 +1,42 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { Search } from '../Search';
 import { Loader } from '../Loader';
 import { LoadMore } from './LoadMore';
 import { NoResult } from '../NoResult';
-import { useGetColumns } from '../../hooks';
+import { usePhotoStore } from '../../stores';
 import { MasonryColumn } from './MasonryColumn';
+import { MASONRY_COLUMN_WIDTH } from '../../constants';
 import { MasonryStyled, MasonryContainer } from './styles';
  
 export const Masonry = () => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const {columns, isLoading, columnsHeights} = useGetColumns(ref);
+  const [searchParams] = useSearchParams();
+  const {columns, isLoading, columnsHeights, reorderPhotos, getPhotos, searchPhotos} = usePhotoStore();
+
+  useEffect(() => {
+    if (searchParams.get('q')) {
+      searchPhotos(searchParams.get('q') || '');
+    } else {
+      getPhotos();
+    }
+  }, [searchParams, searchPhotos, getPhotos]);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      reorderPhotos(Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH));
+    });
+    
+    if (ref.current) {
+      resizeObserver.observe(ref.current);
+    }
+    
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [ref, reorderPhotos]);
 
   return <>
     <Search/> 

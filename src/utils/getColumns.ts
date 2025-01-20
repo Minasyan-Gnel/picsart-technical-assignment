@@ -2,14 +2,28 @@ import { GRID_ITEMS_GAP } from "../constants";
 import { Photo, PhotoWithTop } from "../types";
 import { calculateGridItemHeight } from "./calculateGridItemHeight";
 
-type GetColumnsParams = {
+type GetColumnsResult = {
     columns: Array<Array<PhotoWithTop>>,
     columnsHeights: Array<number>,
 }
 
-export const getColumns = (photos: Array<Photo>, columnCount: number): GetColumnsParams => {
-  const columns = Array.from<Photo, PhotoWithTop[]>({ length: columnCount }, () => []);
-  const columnsHeights = new Array<number>(columnCount).fill(0);
+type GetColumnsFn = (
+  photos: Array<Photo>,
+  columnCount: number,
+  prevState?: { columns: Array<Array<PhotoWithTop>>, columnsHeights: Array<number> }
+) => GetColumnsResult;
+
+export const getColumns: GetColumnsFn = (photos, columnCount, prevState) => {
+  let columns: Array<Array<PhotoWithTop>>;
+  let columnsHeights: Array<number>;
+
+  if (prevState) {
+    columns = [...prevState.columns];
+    columnsHeights = [...prevState.columnsHeights];
+  } else {
+    columns = Array.from<Photo, PhotoWithTop[]>({ length: columnCount }, () => []);
+    columnsHeights = new Array<number>(columnCount).fill(0);
+  }
   
   photos.forEach((photo) => {
     const minHeight = Math.min(...columnsHeights);
