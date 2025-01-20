@@ -43,7 +43,7 @@ export const usePhotoStore = createWithEqualityFn<PhotoStore>((set, get) => ({
     set({ isLoading: true });
 
     const photos = await fetchSearchPhotos(query, 1, PER_PAGE_COUNT);
-    const {columns, columnsHeights} = getColumns(photos, columnsCount);
+    const {columns, columnsHeights} = photos.length ? getColumns(photos, columnsCount) : { columns: [], columnsHeights: [] };
 
     set({ photos, columns, columnsHeights, page: 1, isLoading: false, noMorePhotos: photos.length < PER_PAGE_COUNT });
   },
