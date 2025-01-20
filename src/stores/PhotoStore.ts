@@ -14,43 +14,39 @@ type PhotoStore = {
   columns: PhotoWithTop[][];
   columnsHeights: number[];
   getPhotos: () => Promise<void>;
-  reorderPhotos: (newColumnsCount: number) => void;
   loadMore: (query?: string | null) => Promise<void>;
+  redistributePhotos: (newColumnsCount: number) => void;
   searchPhotos: (query: string, page?: number) => Promise<void>;
 }
 
 export const usePhotoStore = createWithEqualityFn<PhotoStore>((set, get) => ({
   page: 1,
   photos: [],
-  columns: [[]],
+  columns: [],
+  columnsCount: 0,
   isLoading: false,
   columnsHeights: [],
   noMorePhotos: false,
-  columnsCount: Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH),
   getPhotos: async () => {
-    const { columnsCount } = get();
-
     set({ isLoading: true });
 
     const photos = await fetchPhotos(1, PER_PAGE_COUNT);
-    const {columns, columnsHeights} = getColumns(photos, columnsCount);
+    const {columns, columnsHeights} = getColumns(photos, Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH));
 
     set({ photos, columns, columnsHeights, page: 1, isLoading: false });
   },
   searchPhotos: async (query) => {
-    const { columnsCount } = get();
-
     set({ isLoading: true });
 
     const photos = await fetchSearchPhotos(query, 1, PER_PAGE_COUNT);
-    const {columns, columnsHeights} = photos.length ? getColumns(photos, columnsCount) : { columns: [], columnsHeights: [] };
+    const {columns, columnsHeights} = photos.length ? getColumns(photos, Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH)) : { columns: [], columnsHeights: [] };
 
     set({ photos, columns, columnsHeights, page: 1, isLoading: false, noMorePhotos: photos.length < PER_PAGE_COUNT });
   },
-  reorderPhotos: (newColumnsCount) => {
+  redistributePhotos: (newColumnsCount) => {
     const { photos, columnsCount } = get();
-
-    if (columnsCount !== newColumnsCount) {
+  
+    if (photos.length && columnsCount !== newColumnsCount) {
       const {columns, columnsHeights} = getColumns(photos, newColumnsCount);
       
       set({ columns, columnsHeights, columnsCount: newColumnsCount });

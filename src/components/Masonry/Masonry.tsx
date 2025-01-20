@@ -14,7 +14,7 @@ export const Masonry = () => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [searchParams] = useSearchParams();
-  const {columns, isLoading, columnsHeights, reorderPhotos, getPhotos, searchPhotos} = usePhotoStore();
+  const {columns, isLoading, columnsHeights, redistributePhotos, getPhotos, searchPhotos} = usePhotoStore();
 
   useEffect(() => {
     if (searchParams.get('q')) {
@@ -26,7 +26,7 @@ export const Masonry = () => {
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
-      reorderPhotos(Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH));
+      redistributePhotos(Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH));
     });
     
     if (ref.current) {
@@ -36,7 +36,7 @@ export const Masonry = () => {
     return () => {
       resizeObserver.disconnect();
     };
-  }, [ref, reorderPhotos]);
+  }, [ref, redistributePhotos]);
 
   return <>
     <Search/> 
