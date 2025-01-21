@@ -14,3 +14,9 @@ it('should return the columns and columns heights', () => {
     expect(height).toBeGreaterThan(0);
   }
 });
+
+it('should return the columns and columns heights with prevState', () => {
+  const {columns, columnsHeights} = getColumns(photos, 3, {columns: [[], [], []], columnsHeights: [0, 0, 0]});
+  expect(columns.length).toBe(3);
+  expect(columnsHeights.length).toBe(3);
+});

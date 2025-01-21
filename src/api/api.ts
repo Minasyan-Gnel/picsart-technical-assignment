@@ -4,7 +4,7 @@ import { PEXEL_BASE_URL } from "../constants";
 export const fetchPhotos = async (page = 1, perPageCount = 80): Promise<Photo[]> => {
   const res = await fetch(`${PEXEL_BASE_URL}/curated?per_page=${perPageCount}&page=${page}`, {
     headers: {
-      Authorization: process.env.PEXEL_API_KEY || ''
+      Authorization: process.env.PEXEL_API_KEY as string
     } 
   });
 
@@ -19,7 +19,7 @@ export const fetchPhotos = async (page = 1, perPageCount = 80): Promise<Photo[]>
 export const fetchPhotoById = async (id: number): Promise<Photo> => {
   const res = await fetch(`${PEXEL_BASE_URL}/photos/${id}`, {
     headers: {
-      Authorization: process.env.PEXEL_API_KEY || ''
+      Authorization: process.env.PEXEL_API_KEY as string
     }
   });
 
@@ -34,7 +34,7 @@ export const fetchPhotoById = async (id: number): Promise<Photo> => {
 export const fetchSearchPhotos = async (query: string, page = 1, perPageCount = 80): Promise<Photo[]> => {
   const res = await fetch(`${PEXEL_BASE_URL}/search?query=${query}&per_page=${perPageCount}&page=${page}`, {
     headers: {
-      Authorization: process.env.PEXEL_API_KEY || ''
+      Authorization: process.env.PEXEL_API_KEY as string
     }
   });
 
