@@ -48,15 +48,9 @@ npm run lint
 
 ## Project architecture
 
-# Masonry Grid with Virtual Scroll and Lazy Loading
+### Key Features
 
-## Overview
-
-This project implements a masonry grid layout that efficiently renders images from a third-party API. By combining virtual scrolling, pagination, and lazy loading techniques, the application achieves optimal performance and responsiveness.
-
-## Key Features
-
-### Masonry Grid Layout with Virtual Scroll
+#### Masonry Grid Layout with Virtual Scroll
 
 - **Dynamic Column Calculation**: The height and count of columns are dynamically determined based on the screen width. Images are evenly distributed across columns to ensure a balanced layout.
 - **Column Calculation Details**: When the API response is received, the application calculates the number of columns based on the current screen width. Each image's height is factored into the distribution algorithm to ensure columns are visually balanced. For each image, the shortest column is identified, and the image is appended to that column. This approach ensures an even distribution of images regardless of their dimensions.
@@ -66,12 +60,12 @@ This project implements a masonry grid layout that efficiently renders images fr
 - **Efficient Rendering**: To optimize performance, only visible images in the viewport are rendered. A start and end index are maintained to slice the column array and create a new array containing only the visible elements. This reduces both computational overhead and the number of DOM elements.
 - **Virtual Scroll Updates**: When a new chunk of data is loaded, the current column heights are used as a baseline. The new images are distributed among the columns by iterating through the dataset and appending each image to the column with the minimum height. For example, if the response contains 80 items, only 80 iterations are needed to update the column heights and distribute the images. This process ensures consistent computational complexity, even as the dataset scales.
 
-### Pagination and Lazy Loading
+#### Pagination and Lazy Loading
 
 - **Chunked Data Loading**: Images are loaded in chunks using pagination, reducing the initial load time and memory usage. Each API response is processed to update column heights and distribute images.
 - **Page Lazy Loading**: The application pages are loaded only when navigated to, ensuring faster initial load times.
 
-### Performance Optimization
+#### Performance Optimization
 
 - **State Management**: Zustand is used for state management, offering a lightweight, flexible, and efficient solution.
 - **Code Optimization**: The application leverages React’s `useMemo` and `useCallback` hooks to optimize performance and minimize re-renders.
@@ -80,13 +74,13 @@ This project implements a masonry grid layout that efficiently renders images fr
   - Code splitting is utilized to load only the required JavaScript bundles.
   - Minification and Gzip compression reduce the size of production files.
 
-## Technical Highlights
+#### Technical Highlights
 
 - **Virtual Scrolling**: Achieves high performance by rendering only the visible portion of the grid and preloading adjacent elements.
 - **Dynamic Layout**: Adapts to different screen sizes, providing a seamless experience across devices.
 - **Scalable Architecture**: The combination of pagination, lazy loading, and efficient state management ensures scalability as the dataset grows.
 
-## How to run the project
+#### How to run the project
 
 1.  Clone the repository
 2.  Install the dependencies by running `npm ci`
