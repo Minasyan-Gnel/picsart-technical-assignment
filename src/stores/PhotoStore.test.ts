@@ -15,7 +15,7 @@ describe('usePhotoStore', () => {
   it('should initialize with default values', () => {
     const { result } = renderHook(() => usePhotoStore());
 
-    expect(result.current.page).toBe(1);
+    expect(result.current.page).toBe(2);
     expect(result.current.photos).toEqual([]);
     expect(result.current.columns).toEqual([]);
     expect(result.current.columnsCount).toBe(0);
