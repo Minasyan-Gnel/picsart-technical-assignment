@@ -16,7 +16,7 @@ import {
   PhotoDetailsImageWrapperStyled,
 } from './styles';
 
-export const PhotoDetails = () => {
+const PhotoDetails = () => {
   const { id } = useParams();
 
   const [photo, setPhoto] = useState<Photo | null>(null);
@@ -57,7 +57,11 @@ export const PhotoDetails = () => {
             </PhotoDetailsInfoStyled>
           </PhotoDetailsImageInfoStyled>
           <PhotoDetailsImageWrapperStyled width={width} height={height}>
-            <img src={photo.src.original} alt={photo.alt || 'Original image'} />
+            <picture>
+              <source media="(min-width: 768px)" srcSet={photo.src.original} />
+              <source media="(max-width: 590px)" srcSet={photo.src.medium} />
+              <img src={photo.src.original} alt={photo.alt || ""} />
+            </picture>
           </PhotoDetailsImageWrapperStyled>
         </PhotoDetailsStyled>
       </PhotoDetailsContainerStyled>
@@ -66,3 +70,7 @@ export const PhotoDetails = () => {
     )}
   </>;
 };
+
+PhotoDetails.displayName = 'PhotoDetails';
+
+export default PhotoDetails;

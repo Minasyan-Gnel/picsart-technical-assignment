@@ -10,7 +10,7 @@ import { MasonryColumn } from './MasonryColumn';
 import { MASONRY_COLUMN_WIDTH } from '../../constants';
 import { MasonryStyled, MasonryContainer } from './styles';
  
-export const Masonry = () => {
+const Masonry = () => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [searchParams] = useSearchParams();
@@ -50,3 +50,7 @@ export const Masonry = () => {
     </MasonryContainer>
   </>;
 };
+
+Masonry.displayName = 'Masonry';
+
+export default Masonry;

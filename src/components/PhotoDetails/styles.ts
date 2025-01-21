@@ -9,7 +9,7 @@ export const PhotoDetailsContainerStyled = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: calc(100% - 79px);
+  height: calc(100vh - 79px);
 `;
 
 export const PhotoDetailsStyled = styled.div`
@@ -71,8 +71,14 @@ export const PhotoDetailsImageWrapperStyled = styled.div<{ width: number, height
   border-radius: 10px;
   justify-content: center;
   aspect-ratio: ${({ width, height }) => width / height};
+  img {
+    width: 100%;
+  }
 
   @media (max-width: 590px) {
     max-width: 100%;
+    picture {
+      width: 100%;
+    }
   }
 `;

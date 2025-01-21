@@ -8,9 +8,6 @@ export const MasonryItemStyled = styled.div<{ height: number, top: number, color
     height: ${({ height }) => `${height}px`};
     background: ${({ color }) => color};
     transform: translateY(${({ top }) => `${top}px`});
-    :hover {
-        transform: translateY(-10px);
-    }
 `;
 
 export const Image = styled.img`

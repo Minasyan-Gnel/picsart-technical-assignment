@@ -3,7 +3,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import { getColumns } from '../utils';
 import { Photo, PhotoWithTop } from '../types';
 import { fetchPhotos, fetchSearchPhotos } from '../api';
-import { MASONRY_COLUMN_WIDTH, PER_PAGE_COUNT } from '../constants';
+import { MASONRY_COLUMN_WIDTH, PER_PAGE_COUNT, MIN_COLUMNS_COUNT } from '../constants';
 
 type PhotoStore = {
   page: number;
@@ -20,18 +20,21 @@ type PhotoStore = {
 }
 
 export const usePhotoStore = createWithEqualityFn<PhotoStore>((set, get) => ({
-  page: 1,
   photos: [],
   columns: [],
   columnsCount: 0,
   isLoading: false,
   columnsHeights: [],
   noMorePhotos: false,
+  page: MIN_COLUMNS_COUNT,
   getPhotos: async () => {
     set({ isLoading: true });
 
     const photos = await fetchPhotos(1, PER_PAGE_COUNT);
-    const {columns, columnsHeights} = getColumns(photos, Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH));
+    const currentColumnsCount = Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH);
+    const columnsCount = currentColumnsCount > MIN_COLUMNS_COUNT ? currentColumnsCount : MIN_COLUMNS_COUNT;
+
+    const {columns, columnsHeights} = getColumns(photos, columnsCount);
 
     set({ photos, columns, columnsHeights, page: 1, isLoading: false });
   },
@@ -39,7 +42,10 @@ export const usePhotoStore = createWithEqualityFn<PhotoStore>((set, get) => ({
     set({ isLoading: true });
 
     const photos = await fetchSearchPhotos(query, 1, PER_PAGE_COUNT);
-    const {columns, columnsHeights} = photos.length ? getColumns(photos, Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH)) : { columns: [], columnsHeights: [] };
+    const currentColumnsCount = Math.round(window.innerWidth / MASONRY_COLUMN_WIDTH);
+    const columnsCount = currentColumnsCount > MIN_COLUMNS_COUNT ? currentColumnsCount : MIN_COLUMNS_COUNT;
+
+    const {columns, columnsHeights} = photos.length ? getColumns(photos, columnsCount) : { columns: [], columnsHeights: [] };
 
     set({ photos, columns, columnsHeights, page: 1, isLoading: false, noMorePhotos: photos.length < PER_PAGE_COUNT });
   },
@@ -47,7 +53,7 @@ export const usePhotoStore = createWithEqualityFn<PhotoStore>((set, get) => ({
     const { photos, columnsCount } = get();
   
     if (photos.length && columnsCount !== newColumnsCount) {
-      const {columns, columnsHeights} = getColumns(photos, newColumnsCount);
+      const {columns, columnsHeights} = getColumns(photos, newColumnsCount > MIN_COLUMNS_COUNT ? newColumnsCount : MIN_COLUMNS_COUNT);
       
       set({ columns, columnsHeights, columnsCount: newColumnsCount });
     }

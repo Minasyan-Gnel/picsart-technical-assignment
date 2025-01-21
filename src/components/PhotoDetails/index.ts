@@ -1,1 +1,1 @@
-export * from './PhotoDetails';
+export { default } from './PhotoDetails';
